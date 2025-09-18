@@ -1,0 +1,42 @@
+\
+{% extends "base.html" %}
+{% block title %}在庫一覧{% endblock %}
+{% block content %}
+<h1 class="text-xl font-semibold mb-4">在庫一覧</h1>
+
+<div class="overflow-x-auto bg-white shadow rounded-lg">
+  <table class="min-w-full text-sm">
+    <thead class="bg-gray-100 text-gray-700">
+      <tr>
+        <th class="px-3 py-2 text-left">カテゴリ</th>
+        <th class="px-3 py-2 text-left">品名</th>
+        <th class="px-3 py-2 text-right">現在庫</th>
+        <th class="px-3 py-2 text-right">発注点</th>
+        <th class="px-3 py-2 text-right">PAR</th>
+        <th class="px-3 py-2 text-right">推奨発注数</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for it, now, suggested in rows %}
+      {% set under = now <= (it.reorder_point or 0) %}
+      <tr class="border-t">
+        <td class="px-3 py-2">{{ it.location }}</td>
+        <td class="px-3 py-2">
+          <div class="font-medium">{{ it.name }}</div>
+          <div class="text-gray-500 text-xs">{{ it.unit }} / {{ it.supplier.name if it.supplier else '仕入先未設定' }}</div>
+        </td>
+        <td class="px-3 py-2 text-right {{ 'text-red-600 font-semibold' if under else '' }}">{{ "%.2f"|format(now) }}</td>
+        <td class="px-3 py-2 text-right">{{ it.reorder_point }}</td>
+        <td class="px-3 py-2 text-right">{{ it.par }}</td>
+        <td class="px-3 py-2 text-right">{{ suggested }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="mt-4 flex gap-2">
+  <a href="{{ url_for('add_movement') }}" class="px-4 py-2 rounded-md bg-blue-600 text-white">入出庫を登録</a>
+  <a href="{{ url_for('items_list') }}" class="px-4 py-2 rounded-md bg-gray-700 text-white">品目を編集</a>
+</div>
+{% endblock %}

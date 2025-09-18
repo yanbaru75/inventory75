@@ -1,0 +1,50 @@
+\
+{% extends "base.html" %}
+{% block title %}品目{% endblock %}
+{% block content %}
+<h1 class="text-xl font-semibold mb-4">品目{{ '編集' if item else '追加' }}</h1>
+<form method="post" class="bg-white shadow rounded-lg p-4 space-y-3 max-w-xl">
+  <div>
+    <label class="block text-sm text-gray-700 mb-1">品名</label>
+    <input type="text" name="name" value="{{ item.name if item else '' }}" required class="w-full border rounded p-2">
+  </div>
+  <div class="grid grid-cols-2 gap-3">
+    <div>
+      <label class="block text-sm text-gray-700 mb-1">単位</label>
+      <input type="text" name="unit" value="{{ item.unit if item else '個' }}" class="w-full border rounded p-2">
+    </div>
+    <div>
+      <label class="block text-sm text-gray-700 mb-1">保存場所</label>
+      <select name="location" class="w-full border rounded p-2">
+        {% for loc in ['常温','冷蔵','冷凍','消耗'] %}
+          <option value="{{ loc }}" {% if item and item.location==loc %}selected{% endif %}>{{ loc }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="grid grid-cols-2 gap-3">
+    <div>
+      <label class="block text-sm text-gray-700 mb-1">発注点</label>
+      <input type="number" name="reorder_point" value="{{ item.reorder_point if item else 0 }}" class="w-full border rounded p-2">
+    </div>
+    <div>
+      <label class="block text-sm text-gray-700 mb-1">PAR（標準在庫）</label>
+      <input type="number" name="par" value="{{ item.par if item else 0 }}" class="w-full border rounded p-2">
+    </div>
+  </div>
+  <div>
+    <label class="block text-sm text-gray-700 mb-1">仕入先</label>
+    <select name="supplier_id" class="w-full border rounded p-2">
+      <option value="0">（未設定）</option>
+      {% for s in suppliers %}
+        <option value="{{ s.id }}" {% if item and item.supplier_id==s.id %}selected{% endif %}>{{ s.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label class="block text-sm text-gray-700 mb-1">メモ</label>
+    <textarea name="notes" class="w-full border rounded p-2" rows="3">{{ item.notes if item else '' }}</textarea>
+  </div>
+  <button class="px-4 py-2 rounded-md bg-blue-600 text-white">保存</button>
+</form>
+{% endblock %}

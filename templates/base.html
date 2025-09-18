@@ -1,0 +1,56 @@
+\
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}在庫アプリ{% endblock %}</title>
+  <!-- Tailwind via CDN (開発用) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- HTMX for small interactions (optional) -->
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+<body class="bg-gray-50">
+  <nav class="bg-white shadow">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="text-lg font-semibold"><a href="{{ url_for('inventory') }}">喫茶店 在庫</a></div>
+      <div class="space-x-4 text-sm">
+        <a href="{{ url_for('inventory') }}" class="hover:underline">在庫一覧</a>
+        <a href="{{ url_for('add_movement') }}" class="hover:underline">入出庫登録</a>
+        <a href="{{ url_for('items_list') }}" class="hover:underline">品目</a>
+        <a href="{{ url_for('suppliers_list') }}" class="hover:underline">仕入先</a>
+        <span class="text-gray-400">|</span>
+        {% if current_user.is_authenticated %}
+          <span class="text-gray-600">👤 {{ current_user.username }}</span>
+          <a href="{{ url_for('logout') }}" class="hover:underline">ログアウト</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="hover:underline">ログイン</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto p-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="space-y-2 mb-4">
+          {% for category, msg in messages %}
+            <div class="rounded-md p-3 text-sm
+                        {% if category == 'success' %} bg-green-100 text-green-800
+                        {% elif category == 'error' %} bg-red-100 text-red-800
+                        {% else %} bg-blue-100 text-blue-800 {% endif %}">
+              {{ msg }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="text-center text-xs text-gray-400 py-6">
+    <p>Made with Flask + SQLite. 初期ユーザー: admin / admin123（ログイン後に変更推奨）</p>
+  </footer>
+</body>
+</html>

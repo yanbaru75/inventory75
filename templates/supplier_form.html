@@ -1,0 +1,33 @@
+\
+{% extends "base.html" %}
+{% block title %}仕入先{% endblock %}
+{% block content %}
+<h1 class="text-xl font-semibold mb-4">仕入先{{ '編集' if supplier else '追加' }}</h1>
+<form method="post" class="bg-white shadow rounded-lg p-4 space-y-3 max-w-xl">
+  <div>
+    <label class="block text-sm text-gray-700 mb-1">名称</label>
+    <input type="text" name="name" value="{{ supplier.name if supplier else '' }}" required class="w-full border rounded p-2">
+  </div>
+  <div class="grid grid-cols-2 gap-3">
+    <div>
+      <label class="block text-sm text-gray-700 mb-1">電話</label>
+      <input type="text" name="phone" value="{{ supplier.phone if supplier else '' }}" class="w-full border rounded p-2">
+    </div>
+    <div>
+      <label class="block text-sm text-gray-700 mb-1">メール</label>
+      <input type="email" name="email" value="{{ supplier.email if supplier else '' }}" class="w-full border rounded p-2">
+    </div>
+  </div>
+  <div class="grid grid-cols-2 gap-3">
+    <div>
+      <label class="block text-sm text-gray-700 mb-1">納品曜日（例：Mon,Wed,Fri）</label>
+      <input type="text" name="delivery_days" value="{{ supplier.delivery_days if supplier else '' }}" class="w-full border rounded p-2">
+    </div>
+    <div>
+      <label class="block text-sm text-gray-700 mb-1">リードタイム（日）</label>
+      <input type="number" name="lead_time_days" value="{{ supplier.lead_time_days if supplier else 1 }}" class="w-full border rounded p-2">
+    </div>
+  </div>
+  <button class="px-4 py-2 rounded-md bg-blue-600 text-white">保存</button>
+</form>
+{% endblock %}

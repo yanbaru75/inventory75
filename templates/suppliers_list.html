@@ -1,0 +1,38 @@
+\
+{% extends "base.html" %}
+{% block title %}仕入先{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-3">
+  <h1 class="text-xl font-semibold">仕入先一覧</h1>
+  <a href="{{ url_for('supplier_new') }}" class="px-3 py-2 rounded-md bg-blue-600 text-white">＋ 仕入先追加</a>
+</div>
+
+<div class="bg-white shadow rounded-lg overflow-x-auto">
+  <table class="min-w-full text-sm">
+    <thead class="bg-gray-100 text-gray-700">
+      <tr>
+        <th class="px-3 py-2 text-left">名称</th>
+        <th class="px-3 py-2 text-left">電話</th>
+        <th class="px-3 py-2 text-left">メール</th>
+        <th class="px-3 py-2 text-left">納品曜日</th>
+        <th class="px-3 py-2 text-right">リードタイム（日）</th>
+        <th class="px-3 py-2"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in suppliers %}
+      <tr class="border-t">
+        <td class="px-3 py-2">{{ s.name }}</td>
+        <td class="px-3 py-2">{{ s.phone or '-' }}</td>
+        <td class="px-3 py-2">{{ s.email or '-' }}</td>
+        <td class="px-3 py-2">{{ s.delivery_days or '-' }}</td>
+        <td class="px-3 py-2 text-right">{{ s.lead_time_days or 1 }}</td>
+        <td class="px-3 py-2 text-right">
+          <a class="text-blue-600 hover:underline" href="{{ url_for('supplier_edit', supplier_id=s.id) }}">編集</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
