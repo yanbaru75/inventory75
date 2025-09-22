@@ -18,7 +18,7 @@ def create_app():
     # DATABASE_URL があれば Postgres、無ければローカルSQLite
     db_url = os.environ.get("DATABASE_URL")
     if db_url:
-        if db_url.startswith("postgres://"):
+        if db_url.startswith("postgres://") or db_url.startswith("postgresql://"):
             db_url = db_url.replace("postgres://", "postgresql+psycopg://", 1)
         app.config["SQLALCHEMY_DATABASE_URI"] = db_url
     else:
@@ -258,6 +258,7 @@ def supplier_edit(supplier_id):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
+
 
 
 
