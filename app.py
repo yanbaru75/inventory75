@@ -109,12 +109,14 @@ def login():
         flash("ユーザー名またはパスワードが違います。", "error")
     return render_template("login.html")
 
-@app.route("/logout"); @login_required
+@app.route("/logout")
+@login_required
 def logout():
     logout_user(); flash("ログアウトしました。", "success")
     return redirect(url_for("login"))
 
-@app.route("/"); @login_required
+@app.route("/")
+@login_required
 def inventory():
     items = Item.query.order_by(Item.location, Item.name).all()
     stock = current_stock_map()
@@ -125,7 +127,8 @@ def inventory():
         rows.append((it, now, suggested))
     return render_template("inventory.html", rows=rows)
 
-@app.route("/movements/new", methods=["GET","POST"]); @login_required
+@app.route("/movements/new", methods=["GET","POST"])
+@login_required
 def add_movement():
     if request.method == "POST":
         m = StockMovement(
@@ -141,13 +144,15 @@ def add_movement():
     items = Item.query.order_by(Item.name).all()
     return render_template("movement_form.html", items=items)
 
-@app.route("/items"); @login_required
+@app.route("/items")
+@login_required
 def items_list():
     items = Item.query.order_by(Item.location, Item.name).all()
     suppliers = {s.id: s for s in Supplier.query.all()}
     return render_template("items_list.html", items=items, suppliers=suppliers)
 
-@app.route("/items/new", methods=["GET","POST"]); @login_required
+@app.route("/items/new", methods=["GET","POST"])
+@login_required
 def item_new():
     suppliers = Supplier.query.order_by(Supplier.name).all()
     if request.method == "POST":
@@ -165,7 +170,8 @@ def item_new():
         return redirect(url_for("items_list"))
     return render_template("item_form.html", item=None, suppliers=suppliers)
 
-@app.route("/items/<int:item_id>/edit", methods=["GET","POST"]); @login_required
+@app.route("/items/<int:item_id>/edit", methods=["GET","POST"])
+@login_required
 def item_edit(item_id):
     it = db.session.get(Item, item_id)
     if not it:
@@ -184,12 +190,14 @@ def item_edit(item_id):
         return redirect(url_for("items_list"))
     return render_template("item_form.html", item=it, suppliers=suppliers)
 
-@app.route("/suppliers"); @login_required
+@app.route("/suppliers")
+@login_required
 def suppliers_list():
     sp = Supplier.query.order_by(Supplier.name).all()
     return render_template("suppliers_list.html", suppliers=sp)
 
-@app.route("/suppliers/new", methods=["GET","POST"]); @login_required
+@app.route("/suppliers/new", methods=["GET","POST"])
+@login_required
 def supplier_new():
     if request.method == "POST":
         s = Supplier(
@@ -204,7 +212,8 @@ def supplier_new():
         return redirect(url_for("suppliers_list"))
     return render_template("supplier_form.html", supplier=None)
 
-@app.route("/suppliers/<int:supplier_id>/edit", methods=["GET","POST"]); @login_required
+@app.route("/suppliers/<int:supplier_id>/edit", methods=["GET","POST"])
+@login_required
 def supplier_edit(supplier_id):
     s = db.session.get(Supplier, supplier_id)
     if not s:
@@ -222,3 +231,4 @@ def supplier_edit(supplier_id):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
+
