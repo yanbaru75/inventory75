@@ -6,11 +6,16 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import case, func
 
+# -----------------------------
+# App / DB setup
+# -----------------------------
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
     os.makedirs(app.instance_path, exist_ok=True)
+
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
 
+    # DATABASE_URL があれば Postgres、無ければローカルSQLite
     db_url = os.environ.get("DATABASE_URL")
     if db_url:
         if db_url.startswith("postgres://"):
@@ -25,9 +30,13 @@ def create_app():
 
 app = create_app()
 db = SQLAlchemy(app)
+
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
+# -----------------------------
+# Models
+# -----------------------------
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -69,6 +78,9 @@ class StockMovement(db.Model):
 @login_manager.user_loader
 def load_user(user_id): return db.session.get(User, int(user_id))
 
+# -----------------------------
+# Helpers
+# -----------------------------
 def ensure_bootstrap_user():
     if User.query.count() == 0:
         u = User(username="admin", role="admin")
@@ -85,11 +97,18 @@ def current_stock_map():
             else_=StockMovement.qty,
         )
     )
-    rows = db.session.query(StockMovement.item_id, func.coalesce(signed, 0.0)).group_by(StockMovement.item_id).all()
+    rows = db.session.query(StockMovement.item_id, func.coalesce(signed, 0.0))\
+                     .group_by(StockMovement.item_id).all()
     return {item_id: float(qty or 0.0) for item_id, qty in rows}
 
+# -----------------------------
+# Bootstrap & health
+# -----------------------------
 @app.before_request
 def _bootstrap():
+    # /healthz と static はスキップ（DB未準備時でも 200 を返すため）
+    if request.endpoint in ("healthz", "static"):
+        return
     try:
         User.query.first()
     except Exception:
@@ -97,14 +116,22 @@ def _bootstrap():
     if User.query.count() == 0:
         db.create_all(); ensure_bootstrap_user()
 
-@app.route("/login", methods=["GET","POST"])
+@app.route("/healthz")
+def healthz():
+    return "ok", 200
+
+# -----------------------------
+# Routes
+# -----------------------------
+@app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form.get("username","").strip()
-        password = request.form.get("password","")
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
-            login_user(user); flash("ログインしました。", "success")
+            login_user(user)
+            flash("ログインしました。", "success")
             return redirect(url_for("inventory"))
         flash("ユーザー名またはパスワードが違います。", "error")
     return render_template("login.html")
@@ -231,4 +258,3 @@ def supplier_edit(supplier_id):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
-
