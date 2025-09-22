@@ -19,7 +19,7 @@ def create_app():
     db_url = os.environ.get("DATABASE_URL")
     if db_url:
         if db_url.startswith("postgres://"):
-            db_url = db_url.replace("postgres://", "postgresql+psycopg2://", 1)
+            db_url = db_url.replace("postgres://", "postgresql+psycopg://", 1)
         app.config["SQLALCHEMY_DATABASE_URI"] = db_url
     else:
         db_path = os.path.join(app.instance_path, "inventory.db")
@@ -258,3 +258,4 @@ def supplier_edit(supplier_id):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
+
