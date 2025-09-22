@@ -15,15 +15,14 @@ def create_app():
 
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
 
-    # DATABASE_URL があれば Postgres、無ければローカルSQLite
+    # DATABASE_URL があれば Postgres、無ければ SQLite。必ず psycopg v3 を使う。
     db_url = os.environ.get("DATABASE_URL")
-if db_url:
-    # 何で渡されても最終的に psycopg v3 を使う
-    db_url = db_url.replace("postgresql+psycopg2://", "postgresql+psycopg://")
-    db_url = db_url.replace("postgresql://", "postgresql+psycopg://")
-    db_url = db_url.replace("postgres://", "postgresql+psycopg://")
-    app.config["SQLALCHEMY_DATABASE_URI"] = db_url
-else:
+    if db_url:
+        db_url = db_url.replace("postgresql+psycopg2://", "postgresql+psycopg://")
+        db_url = db_url.replace("postgresql://", "postgresql+psycopg://")
+        db_url = db_url.replace("postgres://", "postgresql+psycopg://")
+        app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+    else:
         db_path = os.path.join(app.instance_path, "inventory.db")
         app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 
@@ -260,6 +259,7 @@ def supplier_edit(supplier_id):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
+
 
 
 
